@@ -56,6 +56,12 @@ def create_new_zappi_data(date, hub_serial, hub_pwd):
     
     # get the server url of the wallbox
     server_URL = response.headers['X_MYENERGI-asn']
+    output_zappi_day_before = json.loads(get_data(
+        date=date - datetime.timedelta(days=1),
+        hub=hub_serial,
+        pwd=hub_pwd,
+        url=server_URL,
+        index="Z" + str(hub_serial)))
     
     output_zappi = json.loads(get_data(date=date,
                                        hub=hub_serial,
@@ -63,6 +69,8 @@ def create_new_zappi_data(date, hub_serial, hub_pwd):
                                        url=server_URL,
                                        index="Z" + str(hub_serial)))
     
+    output_zappi = output_zappi_day_before[:-60] + output_zappi[-60:]
+    print(output_zappi)
     # 11705611 sno H
     
     df = pandas.DataFrame.from_records(list(output_zappi.values())[0])
