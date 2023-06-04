@@ -43,9 +43,7 @@ def get_status(hub, pwd, url):
          "https://" + str(url) + "/cgi-jstatus-*"])
 
 
-def create_new_zappi_data(date):
-    hub_serial = "20652993"
-    hub_pwd = "fTuz38HngzLNepf5Y6byR9N9"
+def create_new_zappi_data(date, hub_serial, hub_pwd):
     director_url = "https://director.myenergi.net"
     
     # request connection to the wallbox
