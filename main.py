@@ -71,8 +71,14 @@ def create_new_zappi_data(date):
     df = df.fillna(0)
     for i in ["yr", "mon", "dom", "hr", "min"]:
         df[i] = df[i].astype(int)
-        df[i] = df[i].astype(str)
-    df["Datum"] = df.dom + "/" + df.mon + "/" + df.yr + " " + df.hr + ":" + df["min"]
+        #df[i] = df[i].astype(str)
+    for num, row in df.iterrows():
+        df.loc[num, "Datum"] = datetime.datetime(year=row["yr"],
+                                             month=row["mon"],
+                                             day=row["dom"],
+                                             hour=row["hr"],
+                                             minute=row["min"])
+        
     df = df.drop(columns=["yr", "mon", "dom", "dow", "hr", "min"])
     df = df.set_index("Datum")
     
@@ -90,27 +96,19 @@ def create_new_zappi_data(date):
     df.nect3 = df.nect3 / 3600000
     
     
-    df["Export"] = df.pect3 + df.nect1
-    df["Import"] = df.pect1 + df.pect2 + df.nect3
+    df["Export in kWh"] = df.pect3 + df.nect1
+    df["Import in kWh"] = df.pect1 + df.pect2 + df.nect3
     
-    df["Diff_Import"] = df.imp - df["Import"]
-    df["Diff_Export"] = df.exp - df["Export"]
+    df["Diff_Import"] = df.imp - df["Import in kWh"]
+    df["Diff_Export"] = df.exp - df["Export in kWh"]
     
     df = df.rename(columns={"frq": "Netzfrequenz in Hz",
                             "v1": "Spannung Phase 1 in V",
                             "imp": "Energieimport in kWh",
-                            "pect1": "pos. Leistung Phase 1 in kW",
-                            "pect2": "pos. Leistung Phase 2 in kW",
-                            "nect3": "pos. Leistung Phase 3 in kW", # TODO hier muss die richtung im Verteilerschrank anders rum
-                            "pect3": "neg. Leistung Phase 3 in kW", # TODO hier muss die richtung im Verteilerschrank anders rum
-                            "nect1": "neg. Leistung Phase 1 in kW" })
+                            "pect1": "bezogene Energie Phase 1 in kWh",
+                            "pect2": "bezogene Energie Phase 2 in kWh",
+                            "nect3": "bezogene Energie Phase 3 in kWh", # TODO hier muss die richtung im Verteilerschrank anders rum
+                            "pect3": "abgegebene Energie Phase 3 in kWh", # TODO hier muss die richtung im Verteilerschrank anders rum
+                            "nect1": "abgegebene Energie Phase 1 in kWh" })
     df.to_csv("Zappi_output.csv")
     
-    
-    
-    #output_harvi = json.loads(get_data(hub=hub_serial,
-    #                                   pwd=hub_pwd,
-    #                                   url=server_URL,
-    #                                   index="H"))
-    
-#print(output_harvi)

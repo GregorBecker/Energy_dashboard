@@ -15,6 +15,14 @@ source2 = source2.replace("--", "0")
 source2["Ertrag in kWh"] = source2["Ertrag in kWh"].astype(float)
 source2["Ertrag in kWh"] = source2["Ertrag in kWh"] / 4000
 
+for num, row in source2.iterrows():
+    y = num * 15
+    if y < len(source) - 15:
+        for x in range(0, 15):
+            source.loc[y + x, "Ertrag in kWh"] = row["Ertrag in kWh"] / 15
+
+source.index = source["Datum"]
+
 with st.sidebar:
     st.header("Energiebilanzierung Becker")
     date = st.date_input("Betrachtungstag")
@@ -25,97 +33,110 @@ source3 = source.copy()
 source3 = source3.drop(columns="Datum")
 for i in source3.columns:
     source3[i] = source3[i].astype(float)
+    
 table = source3.sum(axis=0)
+for column in ["Netzfrequenz in Hz", "Spannung Phase 1 in V"]:
+    table[column] /= len(source3[column])
+
 # Create list with headers
-summary_headers = list(table)
+summary_headers = list(table.keys())
 # add the energy system costs
 cost1, cost2, cost3, cost4 = st.columns(4)
-cost1.metric(label=summary_headers[3], value="{:,.2f}".format(float(round(
-    table[summary_headers[3]], 1))))
+cost1.metric(label=summary_headers[5], value="{:,.2f}".format(float(round(
+    table[summary_headers[5]], 2))))
 cost2.metric(label=summary_headers[4], value="{:,.2f}".format(float(round(
-    table[summary_headers[4]], 1))))
-cost3.metric(label=summary_headers[5], value="{:,.2f}".format(float(round(
-    table[summary_headers[5]], 1))))
-cost4.metric(label=summary_headers[6], value="{:,.2f}".format(float(round(
-    table[summary_headers[6]], 1))))
+    table[summary_headers[4]], 2))))
+cost3.metric(label=summary_headers[11], value="{:,.4f}".format(float(round(
+    table[summary_headers[11]], 4))))
+cost4.metric(label=summary_headers[10], value="{:,.4f}".format(float(round(
+    table[summary_headers[10]], 4))))
 
 
-# plot net frequency
-frequency_chart = alt.Chart(source).mark_line().encode(
-    x=alt.X('Datum', axis=alt.Axis(labelAngle=-20)),
-    y=alt.Y('Netzfrequenz in Hz',
-            scale=alt.Scale(domain=[np.min(source["Netzfrequenz in Hz"]),
-                                    np.max(source["Netzfrequenz in Hz"])]))
-).properties(width=500)
+chart1, chart2, chart3, chart4 = st.columns(4)
+with chart1:
+    # plot net frequency
+    st.altair_chart(alt.Chart(source).mark_line().encode(
+        x=alt.X('Datum', axis=alt.Axis()),
+        y=alt.Y('Netzfrequenz in Hz',
+                scale=alt.Scale(domain=[np.min(source["Netzfrequenz in Hz"]),
+                                        np.max(source["Netzfrequenz in Hz"])]))
+    ), use_container_width=True)
 
-voltage_chart = alt.Chart(source).mark_line().encode(
-    x=alt.X('Datum', axis=alt.Axis(labelAngle=-20)),
-    y=alt.Y('Spannung Phase 1 in V',
-            scale=alt.Scale(domain=[np.min(source["Spannung Phase 1 in V"]),
-                                    np.max(source["Spannung Phase 1 in V"])]
-                            ))).properties(width=500)
+with chart2:
+    st.altair_chart(alt.Chart(source).mark_line().encode(
+        x=alt.X('Datum', axis=alt.Axis()),
+        y=alt.Y('Spannung Phase 1 in V',
+                scale=alt.Scale(domain=[np.min(source["Spannung Phase 1 in V"]),
+                                        np.max(source["Spannung Phase 1 in V"])]
+                                ))), use_container_width=True)
+with chart3:
+    st.altair_chart(alt.Chart(source).mark_line().encode(
+            x=alt.X('Datum', axis=alt.Axis()),
+            y=alt.Y('Import in kWh',
+                    scale=alt.Scale(domain=[np.min(source["Import in kWh"]),
+                                            np.max(source["Import in kWh"])]
+                                    ))), use_container_width=True)
     
-st.altair_chart(frequency_chart | voltage_chart, use_container_width=True)
-
-st.altair_chart(
-    alt.Chart(source).mark_line().encode(
-        x=alt.X('Datum', axis=alt.Axis(labelAngle=-20)),
-        y=alt.Y('Import',
-                scale=alt.Scale(domain=[np.min(source["Import"]),
-                                        np.max(source["Import"])]
-                                ))
-    ).properties(width="container"),
-    use_container_width=True)
+with chart4:
+    base = alt.Chart(source).transform_fold(["Export in kWh",
+                                             "Ertrag in kWh"],
+                                            as_=['Plot', 'Energie']
+                                            ).mark_line().encode(
+            x='Datum',
+            y='Energie:Q',
+            color='Plot:N'
+    )
+    st.altair_chart(base, use_container_width=True)
     
+for column in ["Netzfrequenz in Hz", "Spannung Phase 1 in V"]:
+    table[column] /= len(source3[column])
 
-st.altair_chart(
-        alt.Chart(source2).mark_line().encode(
-                x=alt.X('Datum', axis=alt.Axis(labelAngle=-20)),
-                y=alt.Y('Ertrag in kWh',
-                        scale=alt.Scale(
-                            domain=[np.min(source2["Ertrag in kWh"]),
-                                    np.max(source2["Ertrag in kWh"])]
-                            ))
-        ).properties(width="container"),
-        use_container_width=True)
+# add the energy system costs
+cost5, cost6, cost7, cost8 = st.columns(4)
+cost5.metric(label=summary_headers[1], value="{:,.4f}".format(float(round(
+    table[summary_headers[1]], 4))))
+cost6.metric(label=summary_headers[2], value="{:,.4f}".format(float(round(
+    table[summary_headers[2]], 4))))
+cost7.metric(label=summary_headers[3], value="{:,.4f}".format(float(round(
+    table[summary_headers[3]], 4))))
+cost8.metric(label=summary_headers[11], value="{:,.4f}".format(float(round(
+    table[summary_headers[11]], 4))))
 
 
-plt1 = alt.Chart(source).mark_line().encode(
-        x=alt.X('Datum', axis=alt.Axis(labelAngle=-20)),
-        y=alt.Y('Diff_Import',
-                scale=alt.Scale(domain=[np.min(source["Diff_Import"]),
-                                        np.max(source["Diff_Import"])]
-                                ))
-    )
-plt2 = alt.Chart(source).mark_line().encode(
-            x=alt.X('Datum', axis=alt.Axis(labelAngle=-20)),
-            y=alt.Y('Diff_Export',
-                    scale=alt.Scale(domain=[np.min(source["Diff_Export"]),
-                                            np.max(source["Diff_Export"])]
-                                    ))
-    )
+chart5, chart6, chart7, chart8 = st.columns(4)
+with chart5:
+    # plot net frequency
+    st.altair_chart(alt.Chart(source).mark_line().encode(
+            x=alt.X('Datum', axis=alt.Axis()),
+            y=alt.Y('bezogene Energie Phase 1 in kWh',
+                    scale=alt.Scale(
+                        domain=[np.min(source["Import in kWh"]),
+                                np.max(source["Import in kWh"])]))
+    ), use_container_width=True)
 
-st.altair_chart(plt1 + plt2, use_container_width=True)
+with chart6:
+    st.altair_chart(alt.Chart(source).mark_line().encode(
+            x=alt.X('Datum', axis=alt.Axis()),
+            y=alt.Y('bezogene Energie Phase 2 in kWh',
+                    scale=alt.Scale(
+                        domain=[np.min(source["Import in kWh"]),
+                                np.max(source["Import in kWh"])]
+                        ))), use_container_width=True)
+    
+with chart7:
+    st.altair_chart(alt.Chart(source).mark_line().encode(
+            x=alt.X('Datum', axis=alt.Axis()),
+            y=alt.Y('bezogene Energie Phase 3 in kWh',
+                    scale=alt.Scale(domain=[np.min(source["Import in kWh"]),
+                                            np.max(source["Import in kWh"])]
+                                    ))), use_container_width=True)
 
-bar = alt.Chart(source).mark_area(opacity=0.7, interpolate='cardinal').encode(
-        x=alt.X('Datum', axis=alt.Axis(title='Datum')),
-        y=alt.Y('pos. Leistung Phase 2 in kW'),
-        tooltip=['Datum', alt.Tooltip('pos. Leistung Phase 2 in kW')],
-        fill=alt.Fill(field='Type', title='Courbe : '))
+with chart8:
+    st.altair_chart(alt.Chart(source).mark_line().encode(
+            x=alt.X('Datum', axis=alt.Axis()),
+            y=alt.Y('Import in kWh',
+                    scale=alt.Scale(
+                        domain=[np.min(source["Import in kWh"]),
+                                np.max(source["Import in kWh"])]
+                        ))), use_container_width=True)
 
-bar_original = alt.Chart(source).mark_line(color='red',
-                                           interpolate='cardinal',
-                                           opacity=0.7).encode(
-        x=alt.X('Datum', axis=alt.Axis(title='Datum')),
-        y=alt.Y('Energieimport in kWh'),
-        tooltip=['Datum', alt.Tooltip('Energieimport in kWh')],
-        opacity=alt.Opacity(field='Type', title=None))
-
-st.altair_chart(bar + bar_original, use_container_width=True)
-
-#st.area_chart(data=source,
-#              x="Datum",
-#              y=["Leistung Phase 1 in kW",
-#                 "Leistung Phase 2 in kW",
-#                 "Leistung Phase 3 in kW"],
-#              )
