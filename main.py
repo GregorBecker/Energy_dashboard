@@ -67,11 +67,7 @@ def create_new_zappi_data(date):
                                        url=server_URL,
                                        index="Z" + str(hub_serial)))
     
-    # 11705611
-    print(json.loads(get_data(hub=hub_serial,
-                              pwd=hub_pwd,
-                              url=server_URL,
-                              index="H11705611")))
+    # 11705611 sno H
     
     df = pandas.DataFrame.from_records(list(output_zappi.values())[0])
     df = df.fillna(0)
