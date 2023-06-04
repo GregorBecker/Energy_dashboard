@@ -27,7 +27,7 @@ with st.sidebar:
     st.header("Energiebilanzierung Becker")
     date = st.date_input("Betrachtungstag")
     st.write(date)
-    st.button("Lade neue Daten", on_click=main.create_new_zappi_data(date, st.secret["hub_serial"], st.secret["pwd"]))
+    st.button("Lade neue Daten", on_click=main.create_new_zappi_data(date, st.secrets["hub_serial"], st.secrets["pwd"]))
 
 source3 = source.copy()
 source3 = source3.drop(columns="Datum")
