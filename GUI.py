@@ -36,7 +36,7 @@ voltage_chart = alt.Chart(source).mark_line().encode(
                                     np.max(source["Spannung Phase 1 in V"])]
                             )))
     
-st.altair_chart(frequency_chart | voltage_chart)
+st.altair_chart(frequency_chart | voltage_chart, use_container_width=True)
 
 st.altair_chart(
     alt.Chart(source).mark_line().encode(
