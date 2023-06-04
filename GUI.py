@@ -13,6 +13,11 @@ source2 = source2.replace("--", "0")
 source2["Ertrag in kWh"] = source2["Ertrag in kWh"].astype(float)
 source2["Ertrag in kWh"] = source2["Ertrag in kWh"] / 4000
 
+with st.sidebar:
+    st.header("Energiebilanzierung Becker")
+    
+    
+
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Netzfrequenzmessung an der Wallbox",
                                   "Spannungsmessung an der Wallbox",
                                   "Energiebezugsmessung durch Wallbox",
