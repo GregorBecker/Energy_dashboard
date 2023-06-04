@@ -1,0 +1,119 @@
+#!/usr/bin/python3
+
+import requests
+import logging
+import json
+import subprocess
+import datetime
+import pandas
+from requests.auth import HTTPDigestAuth
+
+
+def get_data(hub, pwd, url, index):
+    today = datetime.date.today() - datetime.timedelta(days=1)
+    today_list = str(today).split("-")
+    today_new = today_list[0] + "-" \
+                + str(int(today_list[1])) + "-" \
+                + str(int(today_list[2]))
+
+    return subprocess.check_output(
+        ['curl',
+         "--digest",
+         "-u",
+         str(hub) + ":" + str(pwd),
+         "-H",
+         'accept: application/json',
+         "-H",
+         'content-type: application/json',
+         "--compressed",
+         "https://" + str(url) + "/cgi-jday-" + str(index) + "-" + today_new])
+
+
+def get_status(hub, pwd, url):
+
+    return subprocess.check_output(
+        ['curl',
+         "--digest",
+         "-u",
+         str(hub) + ":" + str(pwd),
+         "-H",
+         'accept: application/json',
+         "-H",
+         'content-type: application/json',
+         "--compressed",
+         "https://" + str(url) + "/cgi-jstatus-*"])
+
+
+hub_serial = "20652993"
+hub_pwd = "fTuz38HngzLNepf5Y6byR9N9"
+director_url = "https://director.myenergi.net"
+
+# request connection to the wallbox
+response = requests.get(director_url, auth=HTTPDigestAuth(hub_serial, hub_pwd))
+
+# check whether the connection worked (200) or not
+if str(response) != "<Response [200]>":
+    logging.info("Verbindung zur Wallbox konnte NICHT hergestellt werden!")
+    raise ConnectionError
+
+# get the server url of the wallbox
+server_URL = response.headers['X_MYENERGI-asn']
+
+output_zappi = json.loads(get_data(hub=hub_serial,
+                                   pwd=hub_pwd,
+                                   url=server_URL,
+                                   index="Z" + str(hub_serial)))
+
+# 11705611
+print(json.loads(get_data(hub=hub_serial,
+                          pwd=hub_pwd,
+                          url=server_URL,
+                          index="H11705611")))
+
+df = pandas.DataFrame.from_records(list(output_zappi.values())[0])
+df = df.fillna(0)
+for i in ["yr", "mon", "dom", "hr", "min"]:
+    df[i] = df[i].astype(int)
+    df[i] = df[i].astype(str)
+df["Datum"] = df.dom + "/" + df.mon + "/" + df.yr + " " + df.hr + ":" + df["min"]
+df = df.drop(columns=["yr", "mon", "dom", "dow", "hr", "min"])
+df = df.set_index("Datum")
+
+# change frequency data format to decimal
+df.frq = df.frq / 100
+# change voltage data format to decimal
+df.v1 = df.v1 / 10
+# change imported Energy to kWh
+df.imp = df.imp / 3600000
+df.exp = df.exp / 3600000
+df.pect1 = df.pect1 / 3600000
+df.pect2 = df.pect2 / 3600000
+df.pect3 = df.pect3 / 3600000
+df.nect1 = df.nect1 / 3600000
+df.nect3 = df.nect3 / 3600000
+
+
+df["Export"] = df.pect3 + df.nect1
+df["Import"] = df.pect1 + df.pect2 + df.nect3
+
+df["Diff_Import"] = df.imp - df["Import"]
+df["Diff_Export"] = df.exp - df["Export"]
+
+df = df.rename(columns={"frq": "Netzfrequenz in Hz",
+                        "v1": "Spannung Phase 1 in V",
+                        "imp": "Energieimport in kWh",
+                        "pect1": "pos. Leistung Phase 1 in kW",
+                        "pect2": "pos. Leistung Phase 2 in kW",
+                        "nect3": "pos. Leistung Phase 3 in kW", # TODO hier muss die richtung im Verteilerschrank anders rum
+                        "pect3": "neg. Leistung Phase 3 in kW", # TODO hier muss die richtung im Verteilerschrank anders rum
+                        "nect1": "neg. Leistung Phase 1 in kW" })
+df.to_csv("Zappi_output.csv")
+
+
+
+#output_harvi = json.loads(get_data(hub=hub_serial,
+#                                   pwd=hub_pwd,
+#                                   url=server_URL,
+#                                   index="H"))
+
+#print(output_harvi)
