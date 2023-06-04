@@ -15,7 +15,8 @@ source2["Ertrag in kWh"] = source2["Ertrag in kWh"] / 4000
 
 with st.sidebar:
     st.header("Energiebilanzierung Becker")
-    
+    date = st.date_input("Betrachtungstag")
+    st.button("Lade neue Daten")
     
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Netzfrequenzmessung an der Wallbox",
