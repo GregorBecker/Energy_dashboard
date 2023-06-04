@@ -10,12 +10,10 @@ from requests.auth import HTTPDigestAuth
 
 
 def get_data(date, hub, pwd, url, index):
-    print(date)
-    today = datetime.date.today()
-    today_list = str(today).split("-")
+    today_list = str(date).split("-")
     today_new = today_list[0] + "-" \
-                + str(int(today_list[1])) + "-" \
-                + str(int(today_list[2]))
+        + str(int(today_list[1])) + "-" \
+        + str(int(today_list[2]))
 
     return subprocess.check_output(
         ['curl',
