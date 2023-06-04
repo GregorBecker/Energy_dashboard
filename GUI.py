@@ -17,6 +17,7 @@ source2["Ertrag in kWh"] = source2["Ertrag in kWh"] / 4000
 with st.sidebar:
     st.header("Energiebilanzierung Becker")
     date = st.date_input("Betrachtungstag")
+    st.write(date)
     st.button("Lade neue Daten", on_click=main.create_new_zappi_data(date))
     
 
