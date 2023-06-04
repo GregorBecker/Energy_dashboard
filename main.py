@@ -56,6 +56,7 @@ def create_new_zappi_data(date, hub_serial, hub_pwd):
     
     # get the server url of the wallbox
     server_URL = response.headers['X_MYENERGI-asn']
+    
     output_zappi_day_before = json.loads(get_data(
         date=date - datetime.timedelta(days=1),
         hub=hub_serial,
@@ -69,25 +70,25 @@ def create_new_zappi_data(date, hub_serial, hub_pwd):
                                        url=server_URL,
                                        index="Z" + str(hub_serial)))
     
-    #output_zappi = output_zappi_day_before.tail(60) + output_zappi
-    #print(output_zappi)
     # 11705611 sno H
     
     df = pandas.DataFrame.from_records(list(output_zappi.values())[0])
     df2 = pandas.DataFrame.from_records(list(output_zappi_day_before.values())[0])
     df2 = df2.tail(60)
     df = df.head(1380)
-    df = df2 + df
+    df = pandas.concat([df2, df])
     df = df.fillna(0)
+    
     for i in ["yr", "mon", "dom", "hr", "min"]:
         df[i] = df[i].astype(int)
         #df[i] = df[i].astype(str)
     for num, row in df.iterrows():
         df.loc[num, "Datum"] = datetime.datetime(year=row["yr"],
-                                             month=row["mon"],
-                                             day=row["dom"],
-                                             hour=row["hr"],
-                                             minute=row["min"])
+                                                 month=row["mon"],
+                                                 day=row["dom"],
+                                                 hour=row["hr"],
+                                                 minute=row["min"]) \
+            + datetime.timedelta(hours=1)
         
     df = df.drop(columns=["yr", "mon", "dom", "dow", "hr", "min"])
     df = df.set_index("Datum")
