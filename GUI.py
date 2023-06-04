@@ -22,25 +22,21 @@ with st.sidebar:
     
 
 # plot net frequency
-st.altair_chart(
-    alt.Chart(source).mark_line().encode(
-        x=alt.X('Datum', axis=alt.Axis(labelAngle=-20)),
-        y=alt.Y('Netzfrequenz in Hz',
-                scale=alt.Scale(domain=[np.min(source["Netzfrequenz in Hz"]),
-                                        np.max(source["Netzfrequenz in Hz"])]))
-    ).properties(width="container"),
-    use_container_width=True)
+frequency_chart = alt.Chart(source).mark_line().encode(
+    x=alt.X('Datum', axis=alt.Axis(labelAngle=-20)),
+    y=alt.Y('Netzfrequenz in Hz',
+            scale=alt.Scale(domain=[np.min(source["Netzfrequenz in Hz"]),
+                                    np.max(source["Netzfrequenz in Hz"])]))
+)
 
-st.altair_chart(
-    alt.Chart(source).mark_line().encode(
-        x=alt.X('Datum', axis=alt.Axis(labelAngle=-20)),
-        y=alt.Y('Spannung Phase 1 in V',
-                scale=alt.Scale(domain=[np.min(source["Spannung Phase 1 in V"]),
-                                        np.max(source["Spannung Phase 1 in V"])]
-                                ))
-    ).properties(width="container"),
-    use_container_width=True)
+voltage_chart = alt.Chart(source).mark_line().encode(
+    x=alt.X('Datum', axis=alt.Axis(labelAngle=-20)),
+    y=alt.Y('Spannung Phase 1 in V',
+            scale=alt.Scale(domain=[np.min(source["Spannung Phase 1 in V"]),
+                                    np.max(source["Spannung Phase 1 in V"])]
+                            )))
     
+st.altair_chart(frequency_chart | voltage_chart)
 
 st.altair_chart(
     alt.Chart(source).mark_line().encode(
