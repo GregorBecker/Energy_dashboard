@@ -5,7 +5,8 @@ import numpy as np
 import main
 
 # remove sidebar
-st.set_page_config(initial_sidebar_state="collapsed")
+st.set_page_config(initial_sidebar_state="collapsed",
+                   layout="wide")
 
 # get data
 source = pandas.read_csv("Zappi_output.csv")
