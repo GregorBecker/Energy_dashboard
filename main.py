@@ -69,7 +69,7 @@ def create_new_zappi_data(date, hub_serial, hub_pwd):
                                        url=server_URL,
                                        index="Z" + str(hub_serial)))
     
-    output_zappi = output_zappi_day_before[:-60] + output_zappi[-60:]
+    output_zappi = output_zappi_day_before.tail(60) + output_zappi
     print(output_zappi)
     # 11705611 sno H
     
