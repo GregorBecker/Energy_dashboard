@@ -2,6 +2,7 @@ import pandas
 import streamlit as st
 import altair as alt
 import numpy as np
+import main
 
 # remove sidebar
 st.set_page_config(initial_sidebar_state="collapsed")
@@ -16,7 +17,7 @@ source2["Ertrag in kWh"] = source2["Ertrag in kWh"] / 4000
 with st.sidebar:
     st.header("Energiebilanzierung Becker")
     date = st.date_input("Betrachtungstag")
-    st.button("Lade neue Daten")
+    st.button("Lade neue Daten", on_click=main.create_new_zappi_data(date))
     
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Netzfrequenzmessung an der Wallbox",
