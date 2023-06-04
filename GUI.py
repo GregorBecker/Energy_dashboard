@@ -27,14 +27,14 @@ frequency_chart = alt.Chart(source).mark_line().encode(
     y=alt.Y('Netzfrequenz in Hz',
             scale=alt.Scale(domain=[np.min(source["Netzfrequenz in Hz"]),
                                     np.max(source["Netzfrequenz in Hz"])]))
-).properties(width=500)
+).properties(width=450)
 
 voltage_chart = alt.Chart(source).mark_line().encode(
     x=alt.X('Datum', axis=alt.Axis(labelAngle=-20)),
     y=alt.Y('Spannung Phase 1 in V',
             scale=alt.Scale(domain=[np.min(source["Spannung Phase 1 in V"]),
                                     np.max(source["Spannung Phase 1 in V"])]
-                            ))).properties(width=500)
+                            ))).properties(width=450)
     
 st.altair_chart(frequency_chart | voltage_chart, use_container_width=True)
 
