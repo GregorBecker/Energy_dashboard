@@ -24,8 +24,9 @@ with st.sidebar:
 source3 = source.copy()
 source3 = source3.drop(columns="Datum")
 for i in source3.columns:
+    print(i)
     source3[i] = source3[i].astype(float)
-table = source.sum(axis=1)
+table = source3.sum(axis=1)
 st.table(data=table)
 
 # plot net frequency
