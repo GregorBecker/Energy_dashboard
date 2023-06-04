@@ -26,7 +26,19 @@ source3 = source3.drop(columns="Datum")
 for i in source3.columns:
     source3[i] = source3[i].astype(float)
 table = source3.sum(axis=0)
-st.table(data=table)
+# Create list with headers
+summary_headers = list(table)
+# add the energy system costs
+cost1, cost2, cost3, cost4 = st.columns(4)
+cost1.metric(label=summary_headers[3], value="{:,.2f}".format(float(round(
+    table[summary_headers[3]], 1))))
+cost2.metric(label=summary_headers[4], value="{:,.2f}".format(float(round(
+    table[summary_headers[4]], 1))))
+cost3.metric(label=summary_headers[5], value="{:,.2f}".format(float(round(
+    table[summary_headers[5]], 1))))
+cost4.metric(label=summary_headers[6], value="{:,.2f}".format(float(round(
+    table[summary_headers[6]], 1))))
+
 
 # plot net frequency
 frequency_chart = alt.Chart(source).mark_line().encode(
