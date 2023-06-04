@@ -21,6 +21,8 @@ with st.sidebar:
     st.write(date)
     st.button("Lade neue Daten", on_click=main.create_new_zappi_data(date))
     
+table = source.sum(axis=1)
+st.table(data=table)
 
 # plot net frequency
 frequency_chart = alt.Chart(source).mark_line().encode(
