@@ -22,7 +22,7 @@ with st.sidebar:
     st.button("Lade neue Daten", on_click=main.create_new_zappi_data(date))
 
 source3 = source.copy()
-source3 = source3.drop("Datum")
+source3 = source3.drop(columns="Datum")
 for i in source3.columns():
     source3[i] = source3[i].astype(float)
 table = source.sum(axis=1)
