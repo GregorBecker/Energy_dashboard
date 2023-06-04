@@ -74,6 +74,10 @@ def create_new_zappi_data(date, hub_serial, hub_pwd):
     # 11705611 sno H
     
     df = pandas.DataFrame.from_records(list(output_zappi.values())[0])
+    df2 = pandas.DataFrame.from_records(list(output_zappi_day_before.values())[0])
+    df2 = df2.tail(60)
+    df = df.head(1380)
+    df = df2 + df
     df = df.fillna(0)
     for i in ["yr", "mon", "dom", "hr", "min"]:
         df[i] = df[i].astype(int)
