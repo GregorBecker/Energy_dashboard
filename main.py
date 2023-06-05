@@ -118,8 +118,8 @@ def create_new_zappi_data(date, hub_serial, hub_pwd):
                             "imp": "Energieimport in kWh",
                             "pect1": "bezogene Energie Phase 1 in kWh",
                             "pect2": "bezogene Energie Phase 2 in kWh",
-                            "nect3": "bezogene Energie Phase 3 in kWh", # TODO hier muss die richtung im Verteilerschrank anders rum
-                            "pect3": "abgegebene Energie Phase 3 in kWh", # TODO hier muss die richtung im Verteilerschrank anders rum
+                            "pect3": "bezogene Energie Phase 3 in kWh", # TODO hier muss die richtung im Verteilerschrank anders rum
+                            "nect3": "abgegebene Energie Phase 3 in kWh", # TODO hier muss die richtung im Verteilerschrank anders rum
                             "nect1": "abgegebene Energie Phase 1 in kWh" })
     df.to_csv("Zappi_output.csv")
     
