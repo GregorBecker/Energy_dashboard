@@ -107,8 +107,8 @@ def create_new_zappi_data(date, hub_serial, hub_pwd):
     df.nect3 = df.nect3 / 3600000
     
     
-    df["Export in kWh"] = df.pect3 + df.nect1
-    df["Import in kWh"] = df.pect1 + df.pect2 + df.nect3
+    df["Export in kWh"] = df.nect3 + df.nect1
+    df["Import in kWh"] = df.pect1 + df.pect2 + df.pect3
     
     df["Diff_Import"] = df.imp - df["Import in kWh"]
     df["Diff_Export"] = df.exp - df["Export in kWh"]
@@ -118,8 +118,8 @@ def create_new_zappi_data(date, hub_serial, hub_pwd):
                             "imp": "Energieimport in kWh",
                             "pect1": "bezogene Energie Phase 1 in kWh",
                             "pect2": "bezogene Energie Phase 2 in kWh",
-                            "nect3": "bezogene Energie Phase 3 in kWh", # TODO hier muss die richtung im Verteilerschrank anders rum
-                            "pect3": "abgegebene Energie Phase 3 in kWh", # TODO hier muss die richtung im Verteilerschrank anders rum
+                            "pect3": "bezogene Energie Phase 3 in kWh",
+                            "nect3": "abgegebene Energie Phase 3 in kWh",
                             "nect1": "abgegebene Energie Phase 1 in kWh" })
     df.to_csv("Zappi_output.csv")
     
