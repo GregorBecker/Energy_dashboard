@@ -116,6 +116,7 @@ def create_new_zappi_data(date, hub_serial, hub_pwd):
     df = df.rename(columns={"frq": "Netzfrequenz in Hz",
                             "v1": "Spannung Phase 1 in V",
                             "imp": "Energieimport in kWh",
+                            "exp": "Energieexport in kWh",
                             "pect1": "bezogene Energie Phase 1 in kWh",
                             "pect2": "bezogene Energie Phase 2 in kWh",
                             "pect3": "bezogene Energie Phase 3 in kWh",

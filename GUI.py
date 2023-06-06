@@ -42,14 +42,14 @@ for column in ["Netzfrequenz in Hz", "Spannung Phase 1 in V"]:
 summary_headers = list(table.keys())
 # add the energy system costs
 cost1, cost2, cost3, cost4 = st.columns(4)
-cost1.metric(label=summary_headers[5], value="{:,.2f}".format(float(round(
-    table[summary_headers[5]], 2))))
-cost2.metric(label=summary_headers[4], value="{:,.2f}".format(float(round(
-    table[summary_headers[4]], 2))))
-cost3.metric(label=summary_headers[11], value="{:,.4f}".format(float(round(
-    table[summary_headers[11]], 4))))
-cost4.metric(label=summary_headers[10], value="{:,.4f}".format(float(round(
-    table[summary_headers[10]], 4))))
+cost1.metric(label="Netzfrequenz in Hz", value="{:,.2f}".format(float(round(
+    table["Netzfrequenz in Hz"], 2))))
+cost2.metric(label="Spannung Phase 1 in V", value="{:,.2f}".format(float(round(
+    table["Spannung Phase 1 in V"], 2))))
+cost3.metric(label="Energieimport in kWh", value="{:,.4f}".format(float(round(
+    table["Energieimport in kWh"], 4))))
+cost4.metric(label="Energieexport in kWh", value="{:,.4f}".format(float(round(
+    table["Energieexport in kWh"], 4))))
 
 
 chart1, chart2, chart3, chart4 = st.columns(4)
@@ -72,13 +72,13 @@ with chart2:
 with chart3:
     st.altair_chart(alt.Chart(source).mark_line().encode(
             x=alt.X('Datum', axis=alt.Axis()),
-            y=alt.Y('Import in kWh',
+            y=alt.Y('Energieimport in kWh',
                     scale=alt.Scale(domain=[np.min(source["Import in kWh"]),
                                             np.max(source["Import in kWh"])]
                                     ))), use_container_width=True)
     
 with chart4:
-    base = alt.Chart(source).transform_fold(["Export in kWh",
+    base = alt.Chart(source).transform_fold(["Energieexport in kWh",
                                              "Ertrag in kWh"],
                                             as_=['Plot', 'Energie']
                                             ).mark_line().encode(
@@ -93,14 +93,14 @@ for column in ["Netzfrequenz in Hz", "Spannung Phase 1 in V"]:
 
 # add the energy system costs
 cost5, cost6, cost7, cost8 = st.columns(4)
-cost5.metric(label=summary_headers[1], value="{:,.4f}".format(float(round(
-    table[summary_headers[1]], 4))))
-cost6.metric(label=summary_headers[2], value="{:,.4f}".format(float(round(
-    table[summary_headers[2]], 4))))
-cost7.metric(label=summary_headers[3], value="{:,.4f}".format(float(round(
-    table[summary_headers[3]], 4))))
-cost8.metric(label=summary_headers[11], value="{:,.4f}".format(float(round(
-    table[summary_headers[11]], 4))))
+cost5.metric(label="bezogene Energie Phase 1 in kWh", value="{:,.4f}".format(float(round(
+    table["bezogene Energie Phase 1 in kWh"], 4))))
+cost6.metric(label="bezogene Energie Phase 2 in kWh", value="{:,.4f}".format(float(round(
+    table["bezogene Energie Phase 2 in kWh"], 4))))
+cost7.metric(label="bezogene Energie Phase 3 in kWh", value="{:,.4f}".format(float(round(
+    table["bezogene Energie Phase 3 in kWh"], 4))))
+cost8.metric(label="Import in kWh", value="{:,.4f}".format(float(round(
+    table["Import in kWh"], 4))))
 
 
 chart5, chart6, chart7, chart8 = st.columns(4)
